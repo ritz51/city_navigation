@@ -1,16 +1,28 @@
 import { graph, nodes } from "../data/graph";
 
+// Euclidean distance heuristic
 function heuristic(a, b) {
   const dx = nodes[a].x - nodes[b].x;
   const dy = nodes[a].y - nodes[b].y;
+
   return Math.sqrt(dx * dx + dy * dy);
 }
 
+// A*
 export function astar(start, goal) {
-  return weightedAstar(start, goal, 1.0);
+  return search(start, goal, 1);
 }
 
-export function weightedAstar(start, goal, weight = 1) {
+// Weighted A*
+export function weightedAstar(start, goal, weight = 1.5) {
+  return search(start, goal, weight);
+}
+
+// Common search function
+function search(start, goal, weight) {
+
+  const startTime = performance.now();
+
   const open = [start];
   const closed = new Set();
 
@@ -18,21 +30,43 @@ export function weightedAstar(start, goal, weight = 1) {
   const fScore = {};
   const parent = {};
 
-  Object.keys(nodes).forEach((n) => {
-    gScore[n] = Infinity;
-    fScore[n] = Infinity;
+  // Initialize scores
+  Object.keys(nodes).forEach((node) => {
+    gScore[node] = Infinity;
+    fScore[node] = Infinity;
   });
 
   gScore[start] = 0;
-  fScore[start] = heuristic(start, goal);
+
+  fScore[start] =
+    weight * heuristic(start, goal);
+
+  let nodesVisited = 0;
 
   while (open.length > 0) {
-  
-    open.sort((a, b) => fScore[a] - fScore[b]);
+
+    // Select node with lowest f-score
+    open.sort((a, b) => {
+      return fScore[a] - fScore[b];
+    });
+
     const current = open.shift();
 
+    if (closed.has(current)) {
+      continue;
+    }
+
+    closed.add(current);
+    nodesVisited++;
+
+    // Destination reached
     if (current === goal) {
+
+      const endTime = performance.now();
+
+      // Reconstruct path
       const path = [];
+
       let temp = goal;
 
       while (temp) {
@@ -41,34 +75,52 @@ export function weightedAstar(start, goal, weight = 1) {
       }
 
       return {
-        path,
-        cost: gScore[goal]
+        path: path,
+        cost: gScore[goal],
+        nodesVisited: nodesVisited,
+        executionTime: endTime - startTime
       };
     }
 
-    closed.add(current);
+    // Explore neighbors
+    const neighbors = graph[current] || [];
 
-    for (const edge of graph[current]) {
+    for (const edge of neighbors) {
+
       const neighbor = edge.to;
 
-      if (closed.has(neighbor)) continue;
+      if (closed.has(neighbor)) {
+        continue;
+      }
 
-      const tentative = gScore[current] + edge.cost;
+      const tentativeG =
+        gScore[current] + edge.cost;
 
-      if (tentative < gScore[neighbor]) {
+      // Better route found
+      if (tentativeG < gScore[neighbor]) {
+
         parent[neighbor] = current;
-        gScore[neighbor] = tentative;
-        fScore[neighbor] =
-          tentative + weight * heuristic(neighbor, goal);
 
-        if (!open.includes(neighbor))
+        gScore[neighbor] = tentativeG;
+
+        fScore[neighbor] =
+          tentativeG +
+          weight * heuristic(neighbor, goal);
+
+        if (!open.includes(neighbor)) {
           open.push(neighbor);
+        }
       }
     }
   }
 
+  const endTime = performance.now();
+
+  // No route
   return {
     path: [],
-    cost: -1
+    cost: Infinity,
+    nodesVisited: nodesVisited,
+    executionTime: endTime - startTime
   };
 }

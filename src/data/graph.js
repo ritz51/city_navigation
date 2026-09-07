@@ -1,53 +1,116 @@
-// 18 City Locations
+// All locations and their positions on the map
 export const nodes = {
-  C1_A: { x: 70, y: 50 },
-  C1_B: { x: 150, y: 80 },
-  C1_C: { x: 110, y: 140 },
+  C1_A: { x: 80, y: 70 },
+  C1_B: { x: 180, y: 50 },
+  C1_C: { x: 280, y: 100 },
 
-  C2_A: { x: 40, y: 240 },
-  C2_B: { x: 110, y: 280 },
-  C2_C: { x: 210, y: 240 },
+  C2_A: { x: 70, y: 200 },
+  C2_B: { x: 180, y: 230 },
+  C2_C: { x: 300, y: 190 },
 
-  C3_A: { x: 70, y: 410 },
-  C3_B: { x: 150, y: 450 },
-  C3_C: { x: 260, y: 360 },
+  C3_A: { x: 80, y: 350 },
+  C3_B: { x: 190, y: 380 },
+  C3_C: { x: 310, y: 330 },
 
-  C4_A: { x: 470, y: 140 },
-  C4_B: { x: 590, y: 70 },
-  C4_C: { x: 650, y: 180 },
+  C4_A: { x: 470, y: 90 },
+  C4_B: { x: 590, y: 60 },
+  C4_C: { x: 700, y: 120 },
 
-  C5_A: { x: 430, y: 300 },
-  C5_B: { x: 540, y: 340 },
-  C5_C: { x: 630, y: 260 },
+  C5_A: { x: 450, y: 230 },
+  C5_B: { x: 570, y: 260 },
+  C5_C: { x: 700, y: 210 },
 
-  C6_A: { x: 700, y: 410 },
-  C6_B: { x: 820, y: 330 },
-  C6_C: { x: 920, y: 430 }
+  C6_A: { x: 450, y: 390 },
+  C6_B: { x: 590, y: 360 },
+  C6_C: { x: 720, y: 410 }
 };
 
-// Roads with weights
-export const graph = {
-  C1_A: [{to:"C1_B",cost:2},{to:"C1_C",cost:4}],
-  C1_B: [{to:"C1_A",cost:2},{to:"C1_C",cost:3},{to:"C4_A",cost:8}],
-  C1_C: [{to:"C1_A",cost:4},{to:"C1_B",cost:3},{to:"C2_A",cost:6}],
 
-  C2_A: [{to:"C1_C",cost:6},{to:"C2_B",cost:3}],
-  C2_B: [{to:"C2_A",cost:3},{to:"C2_C",cost:2},{to:"C4_B",cost:10}],
-  C2_C: [{to:"C2_B",cost:2},{to:"C3_B",cost:5}],
+// Roads
+// [starting point, ending point, cost]
 
-  C3_A: [{to:"C3_B",cost:3}],
-  C3_B: [{to:"C3_A",cost:3},{to:"C3_C",cost:2},{to:"C2_C",cost:5}],
-  C3_C: [{to:"C3_B",cost:2},{to:"C5_A",cost:7}],
+const roads = [
 
-  C4_A: [{to:"C1_B",cost:8},{to:"C4_B",cost:2}],
-  C4_B: [{to:"C4_A",cost:2},{to:"C4_C",cost:3},{to:"C2_B",cost:10},{to:"C6_B",cost:9}],
-  C4_C: [{to:"C4_B",cost:3},{to:"C5_A",cost:4}],
+  // City 1
+  ["C1_A", "C1_B", 3],
+  ["C1_B", "C1_C", 4],
+  ["C1_A", "C1_C", 9],
 
-  C5_A: [{to:"C4_C",cost:4},{to:"C5_B",cost:2},{to:"C3_C",cost:7}],
-  C5_B: [{to:"C5_A",cost:2},{to:"C5_C",cost:3},{to:"C6_A",cost:6}],
-  C5_C: [{to:"C5_B",cost:3}],
+  // City 2
+  ["C2_A", "C2_B", 2],
+  ["C2_B", "C2_C", 5],
+  ["C2_A", "C2_C", 8],
 
-  C6_A: [{to:"C5_B",cost:6},{to:"C6_B",cost:2}],
-  C6_B: [{to:"C6_A",cost:2},{to:"C6_C",cost:2},{to:"C4_B",cost:9}],
-  C6_C: [{to:"C6_B",cost:2}]
-};
+  // City 3
+  ["C3_A", "C3_B", 3],
+  ["C3_B", "C3_C", 4],
+
+  // City 4
+  ["C4_A", "C4_B", 3],
+  ["C4_B", "C4_C", 7],
+  ["C4_A", "C4_C", 12],
+
+  // City 5
+  ["C5_A", "C5_B", 2],
+  ["C5_B", "C5_C", 3],
+  ["C5_A", "C5_C", 8],
+
+  // City 6
+  ["C6_A", "C6_B", 2],
+  ["C6_B", "C6_C", 3],
+
+  // Between cities
+  ["C1_A", "C2_A", 6],
+  ["C1_B", "C2_B", 10],
+  ["C1_C", "C2_C", 8],
+
+  ["C2_A", "C3_A", 7],
+  ["C2_B", "C3_B", 8],
+  ["C2_C", "C3_C", 6],
+
+  ["C1_C", "C4_A", 10],
+  ["C2_C", "C4_A", 13],
+  ["C2_B", "C4_B", 14],
+
+  ["C3_C", "C5_A", 7],
+
+  ["C4_A", "C5_A", 6],
+  ["C4_B", "C5_B", 5],
+  ["C4_C", "C5_C", 4],
+
+  ["C5_A", "C6_A", 11],
+  ["C5_B", "C6_B", 6],
+  ["C5_C", "C6_C", 12],
+
+  ["C4_B", "C6_B", 16]
+];
+
+
+// Automatically create the graph
+export const graph = {};
+
+
+// Create empty arrays
+Object.keys(nodes).forEach((node) => {
+  graph[node] = [];
+});
+
+
+// Add roads in both directions
+roads.forEach(([from, to, cost]) => {
+
+  graph[from].push({
+    to: to,
+    cost: cost
+  });
+
+  graph[to].push({
+    to: from,
+    cost: cost
+  });
+
+});
+
+
+// Export roads for MapCanvas
+export { roads };
